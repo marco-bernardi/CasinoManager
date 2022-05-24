@@ -113,6 +113,18 @@ VALUES
 
 DROP TABLE IF EXISTS Giochi CASCADE;
 
+DROP TABLE IF EXISTS Dirige CASCADE;
+CREATE TABLE Dirige(
+    IDSala integer NOT NULL UNIQUE,
+    IDPersonale integer NOT NULL UNIQUE,
+    PRIMARY KEY (IDSala, IDPersonale),
+    FOREIGN KEY (IDSala) REFERENCES Sale(Numero) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDPersonale) REFERENCES Personale(IDPersonale) ON UPDATE CASCADE ON DELETE CASCADE,
+);
+
+
+
+
 CREATE TABLE Giochi (
     IDGioco integer NOT NULL,
     Tipo varchar(25) NOT NULL,
@@ -386,7 +398,8 @@ CREATE TABLE Match (
 
 INSERT INTO Match(IDMatch, IsFinal,Ora,IDTorneo)
 VALUES
-    (1, false, '15:00:00',1);
+    (1, false, '15:00:00',1),
+    (2, true, '18:00:00',1);
 
 DROP TABLE IF EXISTS Disputano CASCADE;
 
@@ -406,7 +419,13 @@ VALUES
     (1, 7, 2000),
     (1, 9, 2000),
     (1, 10, 2000),
-    (1, 23, 2000);
+    (1, 23, 2000),
+    (2, 1, 0),
+    (2, 4, 0),
+    (2, 7, 0),
+    (2, 9, 0),
+    (2, 10, 0),
+    (2, 23, 12000);
 
 
 DROP TABLE IF EXISTS Regole CASCADE;
