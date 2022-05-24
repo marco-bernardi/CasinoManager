@@ -110,20 +110,24 @@ VALUES
     (6, 'Sala Elite','Primo Piano', 'Congressi', 1),
     (7, 'Sala Master','Primo Piano', 'Congressi', 1);
 
-
-DROP TABLE IF EXISTS Giochi CASCADE;
-
 DROP TABLE IF EXISTS Dirige CASCADE;
 CREATE TABLE Dirige(
     IDSala integer NOT NULL UNIQUE,
     IDPersonale integer NOT NULL UNIQUE,
     PRIMARY KEY (IDSala, IDPersonale),
     FOREIGN KEY (IDSala) REFERENCES Sale(Numero) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (IDPersonale) REFERENCES Personale(IDPersonale) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDPersonale) REFERENCES Personale(IDPersonale) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+INSERT INTO Dirige(IDSala, IDPersonale)
+VALUES
+    (1, 16),
+    (2, 17),
+    (3, 18),
+    (4, 19);
 
 
+DROP TABLE IF EXISTS Giochi CASCADE;
 
 CREATE TABLE Giochi (
     IDGioco integer NOT NULL,

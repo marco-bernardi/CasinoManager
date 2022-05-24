@@ -24,14 +24,30 @@ WHERE Tipo='Vincita' AND IDPostazione IN (SELECT Numero FROM Postazioni WHERE ID
 
 // Mostrare statistiche tavolo vincite sconfitte
 
-SELECT Nome, COUNT(IDTx) as vincite, COUNT(IDTx) as perdite
-FROM Postazioni LEFT JOIN Transazione tx ON Numero=tx.IDPostazione GROUP BY Nome,tx.Tipo HAVING tx.Tipo='Vincita'
+// CON VIEW
+DROP VIEW IF EXISTS vincite;
+CREATE VIEW vincite AS
+SELECT Nome, COUNT(IDTx) as Vincite FROM Postazioni LEFT JOIN Transazione ON Numero=IDPostazione 
+WHERE Tipo='Vincita' GROUP BY Nome,Tipo;
+ 
+DROP VIEW IF EXISTS perdite;
+CREATE VIEW perdite AS
+SELECT Nome, COUNT(IDTx) as Perdite FROM Postazioni LEFT JOIN Transazione ON Numero=IDPostazione 
+WHERE Tipo='Perdita' GROUP BY Nome,Tipo ;
 
-(SELECT COUNT(IDTx) FROM Postazioni LEFT JOIN Transazione ON Numero=IDPostazione GROUP BY Nome,Tipo HAVING Tipo='Perdita') as perdite
+SELECT v.Nome,Vincite,Perdite FROM vincite v INNER JOIN perdite p ON v.Nome = p.Nome  
 
-SELECT Nome, COUNT(tx.IDTx) as vincite, COUNT(tx1.IDTx) as perdite FROM Postazioni p, Transazione tx, Transazione tx1 WHERE tx.tipo='Vincita' AND tx1.tipo='Perdita'
-GROUP BY p.Nome,p.Numero,tx.IDPostazione,tx1.IDPostazione HAVING p.Numero=tx.IDPostazione AND p.Numero=tx1.IDPostazione
+// SENZA VIEW
 
+SELECT vin.Nome,Vincite,Perdite FROM 
+(SELECT Nome, COUNT(IDTx) as Vincite FROM Postazioni LEFT JOIN Transazione ON Numero=IDPostazione 
+WHERE Tipo='Vincita' GROUP BY Nome,Tipo) as vin 
+INNER JOIN 
+(SELECT Nome, COUNT(IDTx) as Perdite FROM Postazioni LEFT JOIN Transazione ON Numero=IDPostazione 
+WHERE Tipo='Perdita' GROUP BY Nome,Tipo) as per ON vin.Nome = per.Nome
+
+
+// Mostrare i tavoli che hanno la media delle vittorie superiore a quella delle perdite;
 
 
 
