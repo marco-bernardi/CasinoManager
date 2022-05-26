@@ -1,4 +1,4 @@
-<h3 align="center"><img src="[https://imgur.com/gallery/oNSko](https://i.imgur.com/DFKmTcQ.jpeg)" alt="logo" height="100px"></h3>
+<h3 align="center"><img src="https://i.imgur.com/DFKmTcQ.jpeg" alt="logo" height="100px"></h3>
 <p align="center">CasinoManager</p>
 
 <p align="center">
