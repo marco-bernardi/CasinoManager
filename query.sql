@@ -61,7 +61,32 @@ WHERE m.IsFinal = true AND m.IDTorneo = 1 AND disp.SaldoMano != 0
 
 ------- 5 // Mostrare i turni di lavoro di un dipendente
 
-SELECT ps.nome,ps.cognome,pst.Nome,lv.Ora_Inizio,lv.Ora_Fine FROM Lavora lv INNER JOIN Personale ps ON lv.NumeroPS=ps.IDPersonale INNER JOIN Postazioni pst ON lv.NumeroPs=pst.Numero WHERE ps.IDPersonale=1
+SELECT ps.nome,ps.cognome,pst.Nome,pst.NomeSala,lv.Ora_Inizio,lv.Ora_Fine 
+FROM Lavora lv 
+INNER JOIN Personale ps ON lv.IDPersonale=ps.IDPersonale 
+INNER JOIN Postazioni pst ON lv.NumeroPs=pst.Numero 
+WHERE ps.IDPersonale=1
+
+SELECT DISTINCT Nome, Cognome FROM Personale WHERE IDPersonale IN (SELECT IDPersonale FROM Lavora)
+
+------- 6 // Mostrare i dipendenti che hanno una media di transazioni vincente sopra la media
+
+SELECT DISTINCT p.nome,p.cognome,p.IDPersonale,alldata.mediaImporto FROM (SELECT pe.IDPersonale,AVG(tr.Importo) as mediaImporto 
+                FROM ((Personale as pe INNER JOIN Lavora as l ON pe.IDPersonale=l.IDPersonale) 
+                INNER JOIN Postazioni AS po ON l.NumeroPs=po.Numero) 
+                INNER JOIN Transazioni AS tr ON po.Numero=tr.IDPostazione
+WHERE tr.Tipo='Perdita'
+GROUP BY pe.IDPersonale
+HAVING AVG(tr.importo) > (SELECT AVG(tr.importo) FROM 
+                ((Personale as pe INNER JOIN Lavora as l ON pe.IDPersonale=l.IDPersonale) 
+                INNER JOIN Postazioni AS po ON l.NumeroPs=po.Numero) 
+                INNER JOIN Transazioni AS tr ON po.Numero=tr.IDPostazione
+                WHERE tr.Tipo='Perdita')) as alldata
+                INNER JOIN Personale as p on alldata.IDPersonale=p.IDPersonale
+                order by p.IDPersonale
+
+
+
 
 .-./`) ,---.   .--. ______         .-''-.   _____     __   
 \ .-.')|    \  |  ||    _ `''.   .'_ _   \  \   _\   /  /  

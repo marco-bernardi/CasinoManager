@@ -72,11 +72,15 @@ const char* query[6] = {
         INNER JOIN Match m ON disp.IDMatch = m.IDMatch \
         WHERE m.IsFinal = true AND m.IDTorneo = %s AND disp.SaldoMano != 0",
 
+        // Turni di lavoro di un dipendete
+
         "SELECT ps.nome,ps.cognome,pst.Nome,pst.NomeSala,lv.Ora_Inizio,lv.Ora_Fine \
         FROM Lavora lv \
         INNER JOIN Personale ps ON lv.IDPersonale=ps.IDPersonale \
         INNER JOIN Postazioni pst ON lv.NumeroPs=pst.Numero \
         WHERE ps.IDPersonale=%s",
+
+        // Dipendenti con vincite sopra la media
 
         "SELECT p.nome,p.cognome,p.IDPersonale,alldata.mediaImporto FROM (SELECT pe.IDPersonale,AVG(tr.Importo) as mediaImporto \
         FROM ((Personale as pe INNER JOIN Lavora as l ON pe.IDPersonale=l.IDPersonale) \
@@ -96,11 +100,13 @@ const char* query[6] = {
 void print(PGresult* result){
     int tuple = PQntuples(result);
     int campi = PQnfields(result);
+    cout << left << setw(10) << "Indice";
     for (int i=0; i<campi; ++i) {
     	cout << left << setw(40) << PQfname(result, i);
     }
     cout << "\n\n"; 
     for(int i=0; i<tuple; ++i) {
+        cout << left << setw(10) << i+1;
     	for (int n=0; n<campi; ++n) {
     		cout << left << setw(40) << PQgetvalue(result, i, n);
     	}
@@ -116,7 +122,7 @@ char* chooseParam(PGconn* conn, const char* query, const char* table, int idx) {
     int val;
     cout << "Inserisci il numero del " << table << " scelto: ";
     cin >> val;
-    while (val <= 0) {
+    while (val <= 0 || val > tuple) {
         cout << "Valore non valido\n";
         cout << "Inserisci il numero del " << table << " scelto: ";
         cin >> val;
@@ -184,7 +190,7 @@ int main(int argc, char **argv){
         case 5:
             system("clear");
             sprintf(queryTemp, query[4],chooseParam(
-                conn, "SELECT DISTINCT IDPersonale,Nome, Cognome FROM Personale WHERE IDPersonale IN (SELECT IDPersonale FROM Lavora) ORDER BY IDPersonale ASC", "Dipendenti",0
+                conn, "SELECT DISTINCT Nome, Cognome, IDPersonale FROM Personale WHERE IDPersonale IN (SELECT IDPersonale FROM Lavora)", "Dipendenti",2
             ));
             result = execute(conn, queryTemp);
             print(result);
