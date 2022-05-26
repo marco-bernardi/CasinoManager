@@ -28,7 +28,7 @@ CREATE TABLE Personale (
     Nome varchar(20) NOT NULL,
     Cognome varchar(20),
     Contatto varchar(20) NOT NULL,
-    Via varchar(30) NOT NULL,
+    Via varchar(40) NOT NULL,
     CAP varchar(6) NOT NULL,
     Provincia varchar(2) NOT NULL,
     Stato varchar(2) NOT NULL,
@@ -54,8 +54,8 @@ CREATE TABLE Sale (
     FOREIGN KEY (IDCasinò) REFERENCES Casinò(IDCasinò) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS Dirige CASCADE;
-CREATE TABLE Dirige(
+DROP TABLE IF EXISTS Lavora_sala CASCADE;
+CREATE TABLE Lavora_sala(
     IDSala integer NOT NULL UNIQUE,
     IDPersonale integer NOT NULL UNIQUE,
     PRIMARY KEY (IDSala, IDPersonale),
@@ -134,7 +134,7 @@ CREATE TABLE Tornei (
     DataTorneo DATE NOT NULL,
     BuyIN MONEY NOT NULL,
     Premio MONEY NOT NULL,
-    NomeSala varchar(10) NOT NULL,
+    NomeSala varchar(20) NOT NULL,
     NumeroSala integer NOT NULL,
     IDGioco integer NOT NULL,
     PRIMARY KEY (IDTorneo),
@@ -153,11 +153,6 @@ CREATE TABLE Match (
     PRIMARY KEY (IDMatch),
     FOREIGN KEY (IDTorneo) REFERENCES Tornei(IDTorneo) ON UPDATE CASCADE ON DELETE CASCADE
 );
-
-INSERT INTO Match(IDMatch, IsFinal,Ora,IDTorneo)
-VALUES
-    (1, false, '15:00:00',1),
-    (2, true, '18:00:00',1);
 
 DROP TABLE IF EXISTS Disputano CASCADE;
 

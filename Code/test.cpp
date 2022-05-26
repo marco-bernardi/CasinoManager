@@ -41,50 +41,68 @@ PGresult* execute(PGconn* conn, const char* query) {
 }
 
 const char* query[4] = {
-        // Statistiche tavoli
-        "SELECT vin.Nome,Vincite,vin.med,Perdite,per.med FROM \
-        (SELECT Nome, COUNT(IDTx) as Vincite, AVG(Importo) as med FROM Postazioni LEFT JOIN Transazione ON Numero=IDPostazione \
-        WHERE Tipo='Vincita' GROUP BY Nome,Tipo) as vin \
-        INNER JOIN \
-        (SELECT Nome, COUNT(IDTx) as Perdite, AVG(Importo) as med FROM Postazioni LEFT JOIN Transazione ON Numero=IDPostazione \
-        WHERE Tipo='Perdita' GROUP BY Nome,Tipo) as per ON vin.Nome = per.Nome;",
-
         // Gioco con payout sopra la media
-        "SELECT g.Nome, AVG(tx.Importo) FROM Transazione tx \
-        INNER JOIN Postazioni ps ON tx.IDPostazione = ps.Numero \
+        "SELECT g.Nome as Nome_Gioco, AVG(tx.Importo) as Media_Vittorie FROM Transazioni tx \
+        INNER JOIN Postazioni as ps ON tx.IDPostazione = ps.Numero \
         INNER JOIN Giochi as g ON g.IDGioco = ps.IDGioco \
         WHERE tx.tipo='Vincita' \
         GROUP BY g.Nome \
-        HAVING AVG(tx.Importo) > (SELECT AVG(tx.Importo) FROM Transazione tx WHERE tx.tipo='Vincita');",
-        // Vincita maggiore alla roulette
+        HAVING AVG(tx.Importo) > (SELECT AVG(tx.Importo) FROM Transazioni tx WHERE tx.tipo='Vincita');",
+
+        // Statistiche tavoli
+        "SELECT vin.Nome,Vincite,vin.media,Perdite,per.media FROM \
+        (SELECT ps.Nome, COUNT(IDTx) AS Vincite, AVG(Importo) AS media FROM Postazioni ps LEFT JOIN Transazioni tx ON Numero=IDPostazione \
+        INNER JOIN Sale ON  NomeSala = Sale.Nome AND NumeroSala = Sale.Numero \
+        WHERE tx.Tipo='Vincita' AND IDCasinò=%s GROUP BY ps.Nome,tx.Tipo) AS vin \
+        INNER JOIN \
+        (SELECT ps.Nome, COUNT(IDTx) AS Perdite, AVG(Importo) AS media FROM Postazioni ps LEFT JOIN Transazioni tx ON Numero=IDPostazione \
+        INNER JOIN Sale ON  NomeSala = Sale.Nome AND NumeroSala = Sale.Numero \
+        WHERE tx.Tipo='Perdita' AND IDCasinò=%s GROUP BY ps.Nome,tx.Tipo) AS per ON vin.Nome = per.Nome",
+
+        // Vincita maggiore al gioco selezionato
         "SELECT DISTINCT Nome, Cognome, Importo FROM Clienti \
-        INNER JOIN Transazione ON Clienti.IDCliente=Transazione.IDCliente \
-        WHERE Importo = (SELECT MAX(Importo) FROM Transazione \
+        INNER JOIN Transazioni ON Clienti.IDCliente=Transazioni.IDCliente \
+        WHERE Importo = (SELECT MAX(Importo) FROM Transazioni \
         WHERE Tipo='Vincita' AND IDPostazione IN \
-        (SELECT Numero FROM Postazioni WHERE IDGioco IN (SELECT IDGioco FROM Giochi WHERE Tipo ='Roulette')))",
+        (SELECT Numero FROM Postazioni WHERE IDGioco IN (SELECT IDGioco FROM Giochi WHERE Tipo ='%s')))",
+
         // Vincitore di un torneo
         "SELECT c.Nome,c.Cognome, disp.SaldoMano FROM Clienti c \
         INNER JOIN Disputano disp ON disp.IDCliente = c.IDCliente \
         INNER JOIN Match m ON disp.IDMatch = m.IDMatch \
-        WHERE m.IsFinal = true AND m.IDTorneo = 1 AND disp.SaldoMano != 0"
+        WHERE m.IsFinal = true AND m.IDTorneo = %s AND disp.SaldoMano != 0"
 };
 
 void print(PGresult* result){
     int tuple = PQntuples(result);
     int campi = PQnfields(result);
     for (int i=0; i<campi; ++i) {
-    	cout << left << setw(25) << PQfname(result, i);
+    	cout << left << setw(40) << PQfname(result, i);
     }
     cout << "\n\n"; 
     for(int i=0; i<tuple; ++i) {
     	for (int n=0; n<campi; ++n) {
-    		cout << left << setw(25) << PQgetvalue(result, i, n);
+    		cout << left << setw(40) << PQgetvalue(result, i, n);
     	}
     	cout << '\n';
     }
     cout<<'\n'<< endl;
 }
 
+char* chooseParam(PGconn* conn, const char* query, const char* table, int idx) {
+    PGresult* res = execute(conn, query);
+    print(res);
+    const int tuple = PQntuples(res), campi = PQnfields(res);
+    int val;
+    cout << "Inserisci il numero del " << table << " scelto: ";
+    cin >> val;
+    while (val <= 0 || val > tuple) {
+        cout << "Valore non valido\n";
+        cout << "Inserisci il numero del " << table << " scelto: ";
+        cin >> val;
+    }
+    return PQgetvalue(res, val - 1, idx);
+}
 
 int main(int argc, char **argv){
 
@@ -93,9 +111,9 @@ int main(int argc, char **argv){
     PGresult *result;
     while (true) {
         cout << endl;
-        cout << "1. Statistiche tavoli\n";
-        cout << "2. Gioco con payout sopra la media\n";
-        cout << "3. Vincita maggiore alla roulette\n";
+        cout << "1. Gioco con payout sopra la media\n";
+        cout << "2. Statistiche tavoli\n";
+        cout << "3. Vincita maggiore al gioco selezionato\n";
         cout << "4. Vincitore di un torneo\n";
         cout << "Query da eseguire (0 per uscire): ";
 
@@ -110,6 +128,7 @@ int main(int argc, char **argv){
         char queryTemp[1500];
 
         int i = 0;
+        char* idx;
         switch (q) {
         case 1:
             system("clear");
@@ -119,19 +138,24 @@ int main(int argc, char **argv){
             break;
         case 2:
             system("clear");
-            sprintf(queryTemp, query[1]);
+            idx = chooseParam(conn, "SELECT * FROM Casinò","Casinò", 0);
+            sprintf(queryTemp, query[1],idx,idx );
             result = execute(conn, queryTemp);
             print(result);
             break;
         case 3:
             system("clear");
-            sprintf(queryTemp, query[2]);
+            sprintf(queryTemp, query[2],chooseParam(
+                conn, "SELECT * FROM Giochi", "Gioco",1
+            ));
             result = execute(conn, queryTemp);
             print(result);
             break;
         case 4:
             system("clear");
-            sprintf(queryTemp, query[3]);
+            sprintf(queryTemp, query[3],chooseParam(
+                conn, "select idtorneo as NumeroTorneo, nome, datatorneo as data from tornei", "Torneo",0
+            ));
             result = execute(conn, queryTemp);
             print(result);
             break;
