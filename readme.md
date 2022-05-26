@@ -5,7 +5,7 @@
   Here you can find a simple database to manage easly your casino with some examples query
 </p>
 <p align="center">
-  <h2 align="center">Esecuzione</h2>
+  <h2 align="left">Esecuzione</h2>
   g++ query.cpp -L dependencies\lib -lpq -o codice
 </p>
 
