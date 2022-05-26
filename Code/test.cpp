@@ -40,7 +40,7 @@ PGresult* execute(PGconn* conn, const char* query) {
     return res;
 }
 
-const char* query[4] = {
+const char* query[6] = {
         // Gioco con payout sopra la media
         "SELECT g.Nome as Nome_Gioco, AVG(tx.Importo) as Media_Vittorie FROM Transazioni tx \
         INNER JOIN Postazioni as ps ON tx.IDPostazione = ps.Numero \
@@ -70,7 +70,27 @@ const char* query[4] = {
         "SELECT c.Nome,c.Cognome, disp.SaldoMano FROM Clienti c \
         INNER JOIN Disputano disp ON disp.IDCliente = c.IDCliente \
         INNER JOIN Match m ON disp.IDMatch = m.IDMatch \
-        WHERE m.IsFinal = true AND m.IDTorneo = %s AND disp.SaldoMano != 0"
+        WHERE m.IsFinal = true AND m.IDTorneo = %s AND disp.SaldoMano != 0",
+
+        "SELECT ps.nome,ps.cognome,pst.Nome,pst.NomeSala,lv.Ora_Inizio,lv.Ora_Fine \
+        FROM Lavora lv \
+        INNER JOIN Personale ps ON lv.IDPersonale=ps.IDPersonale \
+        INNER JOIN Postazioni pst ON lv.NumeroPs=pst.Numero \
+        WHERE ps.IDPersonale=%s",
+
+        "SELECT p.nome,p.cognome,p.IDPersonale,alldata.mediaImporto FROM (SELECT pe.IDPersonale,AVG(tr.Importo) as mediaImporto \
+        FROM ((Personale as pe INNER JOIN Lavora as l ON pe.IDPersonale=l.IDPersonale) \
+        INNER JOIN Postazioni AS po ON l.NumeroPs=po.Numero) \
+        INNER JOIN Transazioni AS tr ON po.Numero=tr.IDPostazione \
+        WHERE tr.Tipo='Perdita' \
+        GROUP BY pe.IDPersonale \
+        HAVING AVG(tr.importo) > (SELECT AVG(tr.importo) FROM \
+        ((Personale as pe INNER JOIN Lavora as l ON pe.IDPersonale=l.IDPersonale) \
+        INNER JOIN Postazioni AS po ON l.NumeroPs=po.Numero) \
+        INNER JOIN Transazioni AS tr ON po.Numero=tr.IDPostazione \
+        WHERE tr.Tipo='Perdita')) as alldata \
+        INNER JOIN Personale as p on alldata.IDPersonale=p.IDPersonale \
+        order by p.IDPersonale"
 };
 
 void print(PGresult* result){
@@ -96,7 +116,7 @@ char* chooseParam(PGconn* conn, const char* query, const char* table, int idx) {
     int val;
     cout << "Inserisci il numero del " << table << " scelto: ";
     cin >> val;
-    while (val <= 0 || val > tuple) {
+    while (val <= 0) {
         cout << "Valore non valido\n";
         cout << "Inserisci il numero del " << table << " scelto: ";
         cin >> val;
@@ -115,6 +135,8 @@ int main(int argc, char **argv){
         cout << "2. Statistiche tavoli\n";
         cout << "3. Vincita maggiore al gioco selezionato\n";
         cout << "4. Vincitore di un torneo\n";
+        cout << "5. Visualizzare i turni di lavoro di un dipendente \n";
+        cout << "6. Dipendenti con vincite sopra la media \n";
         cout << "Query da eseguire (0 per uscire): ";
 
         int q = 0;
@@ -156,6 +178,20 @@ int main(int argc, char **argv){
             sprintf(queryTemp, query[3],chooseParam(
                 conn, "select idtorneo as NumeroTorneo, nome, datatorneo as data from tornei", "Torneo",0
             ));
+            result = execute(conn, queryTemp);
+            print(result);
+            break;
+        case 5:
+            system("clear");
+            sprintf(queryTemp, query[4],chooseParam(
+                conn, "SELECT DISTINCT IDPersonale,Nome, Cognome FROM Personale WHERE IDPersonale IN (SELECT IDPersonale FROM Lavora) ORDER BY IDPersonale ASC", "Dipendenti",0
+            ));
+            result = execute(conn, queryTemp);
+            print(result);
+            break;
+        case 6:
+            system("clear");
+            sprintf(queryTemp, query[5]);
             result = execute(conn, queryTemp);
             print(result);
             break;
