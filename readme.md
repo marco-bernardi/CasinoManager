@@ -1,4 +1,4 @@
-<h3 align="center"><img src="https://media.istockphoto.com/photos/the-croupier-holds-a-roulette-ball-in-a-casino-in-his-hand-picture-id1158005632?k=20&m=1158005632&s=612x612&w=0&h=DeeyqQewMX_Y3ZUnUoYEu7HriAXGVkf7WBOjCQjqrSc=)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fsito-scommesse.com%2Fmigliori-siti-casino-online-sicuri%2F&psig=AOvVaw0jFOTxTDLFx-7w7gK2e9a2&ust=1653644298319000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCOD54dXv_PcCFQAAAAAdAAAAABAJ)](https://www.google.com/url?sa=i&url=https%3A%2F%2Fsito-scommesse.com%2Fmigliori-siti-casino-online-sicuri%2F&psig=AOvVaw0jFOTxTDLFx-7w7gK2e9a2&ust=1653644298319000&source=images&cd=vfe&ved=0CAwQjRxqFwoTCOD54dXv_PcCFQAAAAAdAAAAABAU)" alt="logo" height="100px"></h3>
+<h3 align="center"><img src="https://imgur.com/gallery/oNSko" alt="logo" height="100px"></h3>
 <p align="center">CasinoManager</p>
 
 <p align="center">
