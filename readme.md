@@ -1,9 +1,9 @@
 <h3 align="center"><img src="https://i.imgur.com/yl0JUct.jpeg" alt="logo" height="100px"></h3>
-<p align="center">CasinoManager</p>
+<h1 align="center">CasinoManager</h1>
 
-<p3 align="center">
+<p align="center">
   <p align="center">Simple casino manager database</p>
-</p3>
+</p>
 
 
 Here you can find a simple database to manage easly your casino with some examples query
