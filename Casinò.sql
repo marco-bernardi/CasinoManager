@@ -50,8 +50,10 @@ CREATE TABLE Sale (
     Posizione varchar(20) NOT NULL,
     Tipo tipo_sale NOT NULL,
     IDCasinò integer NOT NULL,
+    IDTorneo integer,
     PRIMARY KEY (Nome, Numero),
-    FOREIGN KEY (IDCasinò) REFERENCES Casinò(IDCasinò) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (IDCasinò) REFERENCES Casinò(IDCasinò) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDTorneo) REFERENCES Tornei(IDTorneo) ON UPDATE CASCADE ON DELETE SET NULL 
 );
 
 DROP TABLE IF EXISTS Lavora_sala CASCADE;
@@ -134,12 +136,12 @@ CREATE TABLE Tornei (
     DataTorneo DATE NOT NULL,
     BuyIN MONEY NOT NULL,
     Premio MONEY NOT NULL,
-    NomeSala varchar(20) NOT NULL,
-    NumeroSala integer NOT NULL,
+    NomeSala varchar(20),
+    NumeroSala integer,
     IDGioco integer NOT NULL,
     PRIMARY KEY (IDTorneo),
-    FOREIGN KEY (NomeSala) REFERENCES Sale(Nome) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (NumeroSala) REFERENCES Sale(Numero) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (NomeSala) REFERENCES Sale(Nome) ON UPDATE CASCADE ON DELETE SET NULL,
+    FOREIGN KEY (NumeroSala) REFERENCES Sale(Numero) ON UPDATE CASCADE ON DELETE SET NULL,
     FOREIGN KEY (IDGioco) REFERENCES Giochi(IDGioco) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
@@ -195,7 +197,7 @@ CREATE TABLE Transazioni (
     Tipo tipo_tx NOT NULL,
     TimestampTX TIMESTAMP NOT NULL,
     Importo integer NOT NULL,
-    IDPostazione integer NOT NULL,
+    IDPostazione integer,
     IDCliente integer NOT NULL,
     PRIMARY KEY (IDTx),
     FOREIGN KEY (IDPostazione) REFERENCES Postazioni(Numero) ON UPDATE CASCADE ON DELETE CASCADE,

@@ -315,10 +315,14 @@ VALUES
     (299, 'CKRLYN71T12L219R','Allayne','Ickeringill','8881510870','9731 Toban Terrace','00196','TV','LZ',3,2),
     (300, 'MMNPRY91D25L219X','Perry','Immins','4489899007','38017 Donald Junction','24129','PD','LM',4,1);
 
+
+INSERT INTO Sale(Numero, Nome, Posizione, Tipo, IDCasinò,IDTorneo)
+VALUES
+    (2, 'Sala Rossa','Piano Terra', 'Gambling', 1,2);
 INSERT INTO Sale(Numero, Nome, Posizione, Tipo, IDCasinò)
 VALUES
     (1, 'Sala Verde','Piano Terra', 'Gambling', 1),
-    (2, 'Sala Rossa','Piano Terra', 'Gambling', 1),
+
     (3, 'Sala Gialla','Piano Terra', 'Gambling', 1),
     (4, 'Ristoro 1','Piano Terra', 'Ristoro', 1),
     (5, 'Ristoro 2','Primo Piano', 'Ristoro', 1),
@@ -376,17 +380,17 @@ VALUES
     (10, 'SLOT4','Sala Gialla', 2, 5),
     (11, 'SLOT5','Sala Gialla', 2, 5),
 
-    (12, 'FR1','Sala Verde', 8, 3),
-    (13, 'FR2','Sala Rossa', 9, 3),
-    (14, 'AR1','Sala Gialla', 10, 4),
-    (15, 'AR2','Sala Verde', 8, 4),
-    (16, 'PK1','Sala Rossa', 9, 1),
-    (17, 'PK2','Sala Rossa', 9, 1),
-    (18, 'SLOT1','Sala Gialla', 9, 5),
-    (19, 'SLOT2','Sala Gialla', 9, 5),
-    (20, 'SLOT3','Sala Gialla', 9, 5),
-    (21, 'SLOT4','Sala Gialla', 9, 5),
-    (22, 'SLOT5','Sala Gialla', 9, 5);
+    (12, 'FR1','Sala Blu', 8, 3),
+    (13, 'FR2','Sala Nero', 9, 3),
+    (14, 'AR1','Sala Arancione', 10, 4),
+    (15, 'AR2','Sala Blu', 8, 4),
+    (16, 'PK1','Sala Nero', 9, 1),
+    (17, 'PK2','Sala Nero', 9, 1),
+    (18, 'SLOT1','Sala Arancione', 9, 5),
+    (19, 'SLOT2','Sala Arancione', 9, 5),
+    (20, 'SLOT3','Sala Arancione', 9, 5),
+    (21, 'SLOT4','Sala Arancione', 9, 5),
+    (22, 'SLOT5','Sala Arancione', 9, 5);
 
 INSERT INTO Lavora(NumeroPS, IDPersonale, Ora_Inizio, Ora_Fine)
 VALUES
@@ -2760,7 +2764,7 @@ VALUES
 INSERT INTO Tornei(IDTorneo, Nome,DataTorneo,BuyIN,Premio,NomeSala,NumeroSala,IDGioco)
 VALUES
     (1,'Italian Poker Tour', '2022-05-15',1000, 50000, 'Sala Rossa', 2,1),
-    (2,'PGT ITALY', '2022-06-15',1500, 150000, 'Sala Verde', 9,1),
+    (2,'PGT ITALY', '2022-06-15',1500, 150000, 'Sala Rossa', 2,1),
     (3,'ISOP ITALIA', '2022-07-20',500, 30000, 'Sala Gialla', 10,1);
 
 INSERT INTO Match(IDMatch, IsFinal,Ora,IDTorneo)
