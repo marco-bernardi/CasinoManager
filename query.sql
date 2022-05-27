@@ -1,14 +1,13 @@
- ________ .-./`) ,---.   .--.   ____      .---.    .-./`)  
-|        |\ .-.')|    \  |  | .'  __ `.   | ,_|    \ .-.') 
-|   .----'/ `-' \|  ,  \ |  |/   '  \  \,-./  )    / `-' \ 
-|  _|____  `-'`"`|  |\_ \|  ||___|  /  |\  '_ '`)   `-'`"` 
-|_( )_   | .---. |  _( )_\  |   _.-`   | > (_)  )   .---.  
-(_ o._)__| |   | | (_ o _)  |.'   _    |(  .  .-'   |   |  
-|(_,_)     |   | |  (_,_)\  ||  _( )_  | `-'`-'|___ |   |  
-|   |      |   | |  |    |  |\ (_ o _) /  |        \|   |  
-'---'      '---' '--'    '--' '.(_,_).'   `--------`'---'  
-                                                           
-0
+    ,-----.        .-''-.  .-------.       ____     __  
+  .'  .-,  '.    .'_ _   \ |  _ _   \      \   \   /  / 
+ / ,-.|  \ _ \  / ( ` )   '| ( ' )  |       \  _. /  '  
+;  \  '_ /  | :. (_ o _)  ||(_ o _) /        _( )_ .'   
+|  _`,/ \ _/  ||  (_,_)___|| (_,_).' __  ___(_ o _)'    
+: (  '\_/ \   ;'  \   .---.|  |\ \  |  ||   |(_,_)'     
+ \ `"/  \  )  \ \  `-'    /|  | \ `'   /|   `-'  /      
+  '. \_/``"/)  ) \       / |  |  \    /  \      /       
+    '-----' `-'   `'-..-'  ''-'   `'-'    `-..-'        
+    
 ------- 1 // MOSTRARE I GIOCHI CON UN PAYOUT SUPERIORE ALLA mediaIA 
 
 SELECT g.Nome as Nome_Gioco, AVG(tx.Importo) as Media_Vittorie FROM Transazioni tx 
@@ -69,7 +68,7 @@ WHERE ps.IDPersonale=1
 
 SELECT DISTINCT Nome, Cognome FROM Personale WHERE IDPersonale IN (SELECT IDPersonale FROM Lavora)
 
-------- 6 // Mostrare i dipendenti che hanno una media di transazioni vincente sopra la media
+------- 6 // Mostrare i dipendenti che hanno una media di transazioni perdenti sopra la media
 
 SELECT DISTINCT p.nome,p.cognome,p.IDPersonale,alldata.mediaImporto FROM (SELECT pe.IDPersonale,AVG(tr.Importo) as mediaImporto 
                 FROM ((Personale as pe INNER JOIN Lavora as l ON pe.IDPersonale=l.IDPersonale) 
