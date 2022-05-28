@@ -1,3 +1,211 @@
+DROP TABLE IF EXISTS Casinò CASCADE;
+
+CREATE TABLE Casinò (
+    IDCasinò integer NOT NULL,
+    Nome varchar(40) NOT NULL,
+    Via varchar(30) NOT NULL,
+    CAP varchar(6) NOT NULL,
+    Provincia varchar(2) NOT NULL,
+    Stato varchar(2) NOT NULL,
+    PRIMARY KEY (IDCasinò)
+);
+
+DROP TABLE IF EXISTS Ruoli CASCADE;
+
+CREATE TABLE Ruoli (
+    IDRuolo integer NOT NULL,
+    Nome varchar(20) NOT NULL,
+    Descrizione varchar(400),
+    Salario MONEY,
+    PRIMARY KEY (IDRuolo)
+);
+
+DROP TABLE IF EXISTS Personale CASCADE;
+
+CREATE TABLE Personale (
+    IDPersonale integer NOT NULL UNIQUE,
+    CF varchar(16) NOT NULL,
+    Nome varchar(20) NOT NULL,
+    Cognome varchar(20),
+    Contatto varchar(20) NOT NULL,
+    Via varchar(40) NOT NULL,
+    CAP varchar(6) NOT NULL,
+    Provincia varchar(2) NOT NULL,
+    Stato varchar(2) NOT NULL,
+    IDRuolo integer NOT NULL,
+    IDCasinò integer NOT NULL,
+    PRIMARY KEY (IDPersonale),
+    FOREIGN KEY (IDRuolo) REFERENCES Ruoli(IDRuolo) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDCasinò) REFERENCES Casinò(IDCasinò) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS Sale CASCADE;
+DROP TYPE IF EXISTS tipo_sale CASCADE;
+
+CREATE TYPE tipo_sale AS ENUM ('Gambling', 'Ristoro', 'Congressi');
+
+CREATE TABLE Sale (
+    Numero integer NOT NULL UNIQUE,
+    Nome varchar(20) NOT NULL UNIQUE,
+    Posizione varchar(20) NOT NULL,
+    Tipo tipo_sale NOT NULL,
+    IDCasinò integer NOT NULL,
+    IDTorneo integer,
+    PRIMARY KEY (Nome, Numero),
+    FOREIGN KEY (IDCasinò) REFERENCES Casinò(IDCasinò) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDTorneo) REFERENCES Tornei(IDTorneo) ON UPDATE CASCADE ON DELETE SET NULL 
+);
+
+DROP TABLE IF EXISTS Lavora_sala CASCADE;
+CREATE TABLE Lavora_sala(
+    IDSala integer NOT NULL UNIQUE,
+    IDPersonale integer NOT NULL UNIQUE,
+    PRIMARY KEY (IDSala, IDPersonale),
+    FOREIGN KEY (IDSala) REFERENCES Sale(Numero) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDPersonale) REFERENCES Personale(IDPersonale) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS Giochi CASCADE;
+
+CREATE TABLE Giochi (
+    IDGioco integer NOT NULL,
+    Tipo varchar(25) NOT NULL,
+    Nome varchar(25) NOT NULL,
+    Descrizione varchar(500),
+    PRIMARY KEY (IDGioco)
+);
+
+DROP TABLE IF EXISTS Postazioni CASCADE;
+
+CREATE TABLE Postazioni (
+    Numero integer NOT NULL,
+    Nome varchar(15) NOT NULL,
+    NomeSala varchar(20) NOT NULL,
+    NumeroSala integer NOT NULL,
+    IDGioco integer NOT NULL, 
+    PRIMARY KEY (Numero),
+    FOREIGN KEY (NomeSala) REFERENCES Sale(Nome) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (NumeroSala) REFERENCES Sale(Numero) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDGioco) REFERENCES Giochi(IDGioco) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS Lavora CASCADE;
+
+CREATE TABLE Lavora (
+    NumeroPs integer NOT NULL,
+    IDPersonale integer NOT NULL,
+    Ora_Inizio TIMESTAMP NOT NULL,
+    Ora_Fine TIMESTAMP NOT NULL,
+    PRIMARY KEY (NumeroPs,IDPersonale,Ora_Inizio),
+    FOREIGN KEY (NumeroPs) REFERENCES Postazioni(Numero) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDPersonale) REFERENCES Personale(IDPersonale) ON UPDATE CASCADE ON DELETE CASCADE,
+    check (Ora_Fine > Ora_Inizio)
+);
+
+DROP TABLE IF EXISTS Clienti CASCADE;
+
+CREATE TABLE Clienti (
+    IDCliente integer NOT NULL,
+    CF varchar(16) NOT NULL,
+    Nome varchar(20) NOT NULL,
+    Cognome varchar(20) NOT NULL,
+    Contatto varchar(20),
+    Via varchar(30) NOT NULL,
+    CAP varchar(6) NOT NULL,
+    Provincia varchar(2) NOT NULL,
+    Stato varchar(2) NOT NULL,
+    Saldo MONEY DEFAULT 0 NOT NULL,
+    PRIMARY KEY (IDCliente)
+);
+
+DROP TABLE IF EXISTS ha_clienti CASCADE;
+
+CREATE TABLE ha_clienti (
+    IDCliente integer NOT NULL,
+    IDCasinò integer NOT NULL,
+    PRIMARY KEY (IDCliente,IDCasinò),
+    FOREIGN KEY (IDCliente) REFERENCES Clienti(IDCliente) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDCasinò) REFERENCES Casinò(IDCasinò) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS Tornei CASCADE;
+
+CREATE TABLE Tornei (
+    IDTorneo integer NOT NULL,
+    Nome varchar(20) NOT NULL,
+    DataTorneo DATE NOT NULL,
+    BuyIN MONEY NOT NULL,
+    Premio MONEY NOT NULL,
+    NomeSala varchar(20),
+    NumeroSala integer,
+    IDGioco integer NOT NULL,
+    PRIMARY KEY (IDTorneo),
+    FOREIGN KEY (NomeSala) REFERENCES Sale(Nome) ON UPDATE CASCADE ON DELETE SET NULL,
+    FOREIGN KEY (NumeroSala) REFERENCES Sale(Numero) ON UPDATE CASCADE ON DELETE SET NULL,
+    FOREIGN KEY (IDGioco) REFERENCES Giochi(IDGioco) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS Match CASCADE;
+
+CREATE TABLE Match (
+    IDMatch integer NOT NULL,
+    IsFinal boolean NOT NULL,
+    Ora TIME NOT NULL,
+    IDTorneo integer NOT NULL,
+    PRIMARY KEY (IDMatch),
+    FOREIGN KEY (IDTorneo) REFERENCES Tornei(IDTorneo) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS Disputano CASCADE;
+
+CREATE TABLE Disputano (
+    IDMatch integer NOT NULL,
+    IDCliente integer NOT NULL,
+    SaldoMano integer NOT NULL,
+    FOREIGN KEY (IDMatch) REFERENCES Match(IDMatch) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDCliente) REFERENCES Clienti(IDCliente) ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY (IDMatch,IDCliente)
+);
+
+DROP TABLE IF EXISTS Regole CASCADE;
+
+CREATE TABLE Regole (
+    IDRegola integer NOT NULL,
+    Nome varchar(40) NOT NULL,
+    Descrizione varchar(300) NOT NULL,
+    Penalità varchar(200),
+    PRIMARY KEY (IDRegola)
+);
+
+DROP TABLE IF EXISTS Regolamento CASCADE;
+
+CREATE TABLE Regolamento (
+    IDGioco integer NOT NULL,
+    IDRegola integer NOT NULL,
+    PRIMARY KEY (IDGioco,IDRegola),
+    FOREIGN KEY (IDGioco) REFERENCES Giochi(IDGioco) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDRegola) REFERENCES Regole(IDRegola) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS Transazioni CASCADE;
+DROP TYPE IF EXISTS tipo_tx CASCADE;
+
+CREATE TYPE tipo_tx AS ENUM ('Vincita', 'Perdita', 'Ricarica');
+
+CREATE TABLE Transazioni (
+    IDTx integer NOT NULL,
+    Tipo tipo_tx NOT NULL,
+    TimestampTX TIMESTAMP NOT NULL,
+    Importo integer NOT NULL,
+    IDPostazione integer,
+    IDCliente integer NOT NULL,
+    PRIMARY KEY (IDTx),
+    FOREIGN KEY (IDPostazione) REFERENCES Postazioni(Numero) ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (IDCliente) REFERENCES Clienti(IDCliente) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+-- INSERT DATA
+
 INSERT INTO Casinò(IDCasinò, Nome, Via, CAP, Provincia, Stato)
 VALUES
     ('1', 'Casinò di Venezia','Cannaregio, 2040','30121 ','VE','IT'),
@@ -4094,3 +4302,68 @@ VALUES
     (1290,'Ricarica','2021-06-07 17:11:14', 1259.79, 166),
     (1295,'Ricarica','2021-11-03 17:02:12', 864.47, 65),
     (1299,'Ricarica','2021-10-04 06:27:14', 10245.88, 20);
+
+-- INDEX
+DROP INDEX IF EXISTS idx_transazione
+CREATE INDEX idx_transazione ON transazione(idpostazione,idcliente)
+
+-- QUERY
+
+------- 1 // MOSTRARE I GIOCHI CON UN PAYOUT SUPERIORE ALLA mediaIA 
+
+SELECT g.Nome as Nome_Gioco, AVG(tx.Importo) as Media_Vittorie FROM Transazioni tx 
+INNER JOIN Postazioni AS ps ON tx.IDPostazione = ps.Numero 
+INNER JOIN Giochi AS g ON g.IDGioco = ps.IDGioco 
+WHERE tx.tipo='Vincita' 
+GROUP BY g.Nome 
+HAVING AVG(tx.Importo) > (SELECT AVG(tx.Importo) FROM Transazioni tx WHERE tx.tipo='Vincita')
+
+------- 2 // Mostrare statistiche tavolo vincite sconfitte
+
+SELECT vin.Nome,Vincite,vin.media,Perdite,per.media FROM 
+(SELECT ps.Nome, COUNT(IDTx) AS Vincite, AVG(Importo) AS media FROM Postazioni ps LEFT JOIN Transazioni tx ON Numero=IDPostazione
+INNER JOIN Sale ON  NomeSala = Sale.Nome AND NumeroSala = Sale.Numero
+WHERE tx.Tipo='Vincita' AND IDCasinò=2 GROUP BY ps.Nome,tx.Tipo) AS vin 
+INNER JOIN 
+(SELECT ps.Nome, COUNT(IDTx) AS Perdite, AVG(Importo) AS media FROM Postazioni ps LEFT JOIN Transazioni tx ON Numero=IDPostazione
+INNER JOIN Sale ON  NomeSala = Sale.Nome AND NumeroSala = Sale.Numero
+WHERE tx.Tipo='Perdita' AND IDCasinò=2 GROUP BY ps.Nome,tx.Tipo) AS per ON vin.Nome = per.Nome
+
+------- 3 // Mostrare il cliente che ha vinto la maggior somma di denaro ad un tipo di gioco
+
+SELECT DISTINCT Nome, Cognome, Importo FROM Clienti 
+INNER JOIN Transazioni ON Clienti.IDCliente=Transazioni.IDCliente 
+WHERE Importo = (SELECT MAX(Importo) FROM Transazioni 
+WHERE Tipo='Vincita' AND IDPostazione IN 
+(SELECT Numero FROM Postazioni WHERE IDGioco IN (SELECT IDGioco FROM Giochi WHERE Tipo ='Roulette')))
+
+------- 4 // Mostrare il vincitore di un torneo e 
+
+SELECT c.Nome,c.Cognome, disp.SaldoMano FROM Clienti c 
+INNER JOIN Disputano AS disp ON disp.IDCliente = c.IDCliente 
+INNER JOIN Match AS m ON disp.IDMatch = m.IDMatch 
+WHERE m.IsFinal = true AND m.IDTorneo = 1 AND disp.SaldoMano != 0 
+
+------- 5 // Mostrare i turni di lavoro di un dipendente
+
+SELECT ps.nome,ps.cognome,pst.Nome,pst.NomeSala,lv.Ora_Inizio,lv.Ora_Fine 
+FROM Lavora lv 
+INNER JOIN Personale ps ON lv.IDPersonale=ps.IDPersonale 
+INNER JOIN Postazioni pst ON lv.NumeroPs=pst.Numero 
+WHERE ps.IDPersonale=1
+
+------- 6 // Mostrare i dipendenti che hanno una media di transazioni perdenti sopra la media
+
+SELECT DISTINCT p.nome,p.cognome,p.IDPersonale,alldata.mediaImporto FROM (SELECT pe.IDPersonale,AVG(tr.Importo) as mediaImporto 
+                FROM ((Personale as pe INNER JOIN Lavora as l ON pe.IDPersonale=l.IDPersonale) 
+                INNER JOIN Postazioni AS po ON l.NumeroPs=po.Numero) 
+                INNER JOIN Transazioni AS tr ON po.Numero=tr.IDPostazione
+WHERE tr.Tipo='Perdita'
+GROUP BY pe.IDPersonale
+HAVING AVG(tr.importo) > (SELECT AVG(tr.importo) FROM 
+                ((Personale as pe INNER JOIN Lavora as l ON pe.IDPersonale=l.IDPersonale) 
+                INNER JOIN Postazioni AS po ON l.NumeroPs=po.Numero) 
+                INNER JOIN Transazioni AS tr ON po.Numero=tr.IDPostazione
+                WHERE tr.Tipo='Perdita')) as alldata
+                INNER JOIN Personale as p on alldata.IDPersonale=p.IDPersonale
+                order by p.IDPersonale

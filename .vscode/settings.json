@@ -2,7 +2,9 @@
     "files.associations": {
         "iostream": "cpp",
         "ios": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "xstring": "cpp",
+        "ostream": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }
