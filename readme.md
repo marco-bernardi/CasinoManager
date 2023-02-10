@@ -8,7 +8,7 @@ Project for the Databases course of UniPD
 Casino Database System is a comprehensive platform for managing and organizing data related to casino operations. This system is designed to provide a centralized repository for all casino-related information, including game information, customer data, financial transactions, and more. With its intuitive interface and powerful search capabilities, it's easy to access the information you need to make informed decisions and keep your casino running smoothly. Whether you're a casino manager, owner, or operator, this database system is a valuable tool that can help streamline your operations and maximize your success.
 </p>
 <p align="center">
-  <h2 align="left">Esecuzione</h2>
+  <h2 align="left">Test query</h2>
   g++ query.cpp -L dependencies\lib -lpq -o codice
 </p>
 
